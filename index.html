@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+{% autoescape true %}
+<html>
+  <body>
+    <table border="1">
+      <tr>
+        <th>Timestamp</th>
+        <th>Station Names</th>
+        <th>Station Type</th>
+        <th>NO<sub>2</sub></th>
+        <th>O<sub>3</sub></h>
+        <th>SO<sub>2</sub></th>
+        <th>CO</th>
+        <th>PM<sub>10</sub></th>
+        <th>PM<sub>2.5</sub></th>
+        <th>AQHI</th>
+      </tr>
+      {% for air_quality in air_qualities %}
+        <tr>
+          <td>{{ air_quality.publish_timestamp.strftime('%Y/%m/%d-%H:%M') }}</td>
+          <td>{{ air_quality.station_name }}</td>
+          <td>{{ air_quality.station_type }}</td>
+          <td>{{ air_quality.no2 }}</td>
+          <td>{{ air_quality.o3 }}</td>
+          <td>{{ air_quality.so2 }}</td>
+          <td>{{ air_quality.co }}</td>
+          <td>{{ air_quality.pm10 }}</td>
+          <td>{{ air_quality.pm2_5 }}</td>
+          <td>{{ air_quality.aqhi }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+  </body>
+</html>
+{% endautoescape %}
+

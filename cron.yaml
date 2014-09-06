@@ -1,0 +1,4 @@
+cron:
+- description: grab new data and store them
+  url: /flush
+  schedule: every 10 minutes synchronized
