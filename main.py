@@ -24,7 +24,8 @@ from datetime import datetime
 import os
 
 from bs4 import BeautifulSoup
-from flask import Flask
+import flask
+from google.appengine.ext import ndb
 import jinja2
 import requests
 
@@ -34,11 +35,9 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     extensions=['jinja2.ext.autoescape'],
     autoescape=True)
 
-app = Flask(__name__)
+app = flask.Flask(__name__, static_folder='static')
 # Note: We don't need to call run() since our application is embedded within
 # the App Engine WSGI application server.
-
-from google.appengine.ext import ndb
 
 class AirQuality(ndb.Model):
     source = ndb.StringProperty()
@@ -118,12 +117,33 @@ def grab_and_store_data():
         air_quality.put()
     return str(air_qualities)
 
+@app.route('/charts/<station_name>')
+def get_charts(station_name):
+    name = str(station_name)
+    key = get_air_quality_key()
+    query = AirQuality.query(AirQuality.station_name==name, ancestor=key)
+    datas = query.order(-AirQuality.timestamp).fetch(24)
+    datas.reverse()
+    for data in datas:
+        if data.co != '-':
+            data.co = str(float(data.co)/10)
+    template = JINJA_ENVIRONMENT.get_template('charts.html')
+    return template.render({'datas': datas, 'station_name': name})
+
+@app.route('/charts/Central/Western')
+def _():
+    return get_charts('Central/Western')
+
+@app.route('/js/<path:filename>')
+def get_js(filename):
+    return flask.send_from_directory(app.static_folder, filename)
+
 @app.errorhandler(404)
 def page_not_found(e):
     """Return a custom 404 error."""
     return 'Sorry, Nothing at this URL.', 404
 
 @app.errorhandler(500)
-def page_not_found(e):
+def internal_server_error(e):
     """Return a custom 500 error."""
     return 'Sorry, unexpected error: {}'.format(e), 500
