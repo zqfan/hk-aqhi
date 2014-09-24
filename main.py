@@ -117,12 +117,14 @@ def grab_and_store_data():
         air_quality.put()
     return str(air_qualities)
 
-@app.route('/charts/<station_name>')
-def get_charts(station_name):
-    name = str(station_name)
+@app.route('/charts/stations/<name>')
+def get_charts(name):
+    name = str(name)
     key = get_air_quality_key()
     query = AirQuality.query(AirQuality.station_name==name, ancestor=key)
     datas = query.order(-AirQuality.timestamp).fetch(24)
+    if not datas:
+        return "No data for '%s'" % name, 404
     datas.reverse()
     for data in datas:
         if data.co != '-':
@@ -130,8 +132,8 @@ def get_charts(station_name):
     template = JINJA_ENVIRONMENT.get_template('charts.html')
     return template.render({'datas': datas, 'station_name': name})
 
-@app.route('/charts/Central/Western')
-def _():
+@app.route('/charts/stations/Central/Western')
+def _cw_redirect():
     return get_charts('Central/Western')
 
 @app.route('/js/<path:filename>')

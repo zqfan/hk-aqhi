@@ -15,14 +15,14 @@
             type: 'line'
           },
           title: {
-            text: 'Hong Kong Air Quality and Health Index of {{ station_name }} Station'
+            text: 'Hong Kong Air Quality of {{ station_name }} Station'
           },
           subtitle: {
             text: 'Pollutant: Carbon Monoxide (CO), Fine Suspended Particulates (FSP), Nitrogen Dioxide (NO2), Ozone (O3), Respirable Suspended Particulates (RSP), Sulphur Dioxide (SO2)'
           },
           xAxis: {
             title: {
-              text: 'Period: {{ datas[0].publish_timestamp }} - {{ datas[-1].publish_timestamp }}'
+              text: 'Period: {% if datas %}{{ datas[0].publish_timestamp }} - {{ datas[-1].publish_timestamp }}{% endif %}'
             },
             categories: [{% for data in datas %} '{{ data.publish_timestamp }}', {% endfor %}]
           },
