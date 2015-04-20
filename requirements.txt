@@ -4,6 +4,9 @@
 # in `lib/` subdirectory.
 #
 # Note: The `lib` directory is added to `sys.path` by `appengine_config.py`.
+
+# note(zqfan): https://cloud.google.com/appengine/docs/python/tools/libraries27
+#              pip install -t lib -r requirements.txt
 Flask==0.10
 requests==2.2.1
 six==1.6.1
