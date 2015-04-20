@@ -57,10 +57,10 @@ def get_air_quality_key(source='hk-aqhi'):
     return ndb.Key("AQHI", source)
 
 @app.route('/')
-def get_all_data():
+def get_sample_data():
     key = get_air_quality_key()
     query = AirQuality.query(ancestor=key)
-    air_qualities = query.order(-AirQuality.timestamp).fetch()
+    air_qualities = query.order(-AirQuality.timestamp).fetch(24)
     template = JINJA_ENVIRONMENT.get_template('index.html')
     return template.render({'air_qualities': air_qualities})
 
