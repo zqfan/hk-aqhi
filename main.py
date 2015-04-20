@@ -61,6 +61,9 @@ def get_air_quality_key(source='hk-aqhi'):
 
 @app.route('/')
 def get_sample_data():
+    valid_users = ['aji.zqfan@gmail.com', 'jennyfzl@gmail.com']
+    if users.get_current_user().email() not in valid_users:
+        return 'Not Authorized', 401
     key = get_air_quality_key()
     query = AirQuality.query(ancestor=key)
     air_qualities = query.order(-AirQuality.timestamp).fetch(24)
@@ -70,6 +73,8 @@ def get_sample_data():
         'air_qualities': air_qualities
     })
 
+LATEST_DATA_TIMESTAMP = datetime.datetime.utcnow()
+
 def _get_latest_data():
     key = get_air_quality_key()
     query = AirQuality.query(ancestor=key)
@@ -78,6 +83,11 @@ def _get_latest_data():
 
 @app.route('/flush')
 def grab_and_store_data():
+    global LATEST_DATA_TIMESTAMP
+    delta = datetime.datetime.utcnow() - LATEST_DATA_TIMESTAMP
+    if delta.total_seconds() < 60:
+        raise Exception('Rate limited')
+
     url = 'http://www.aqhi.gov.hk/gt/aqhi/pollutant-and-aqhi-distribution.html'
     resp = requests.get(url)
     soup = BeautifulSoup(resp.content)
@@ -89,6 +99,8 @@ def grab_and_store_data():
     latest_data = _get_latest_data()
     if latest_data and latest_data.publish_timestamp == publish_timestamp:
         return 'no new data'
+
+    LATEST_DATA_TIMESTAMP = datetime.datetime.utcnow()
 
     stations = []
     general_stations = soup.find(id='tblDistribution_g')
