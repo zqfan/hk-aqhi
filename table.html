@@ -1,0 +1,37 @@
+    <div>
+    <table border="1">
+      <tr>
+        <th>Timestamp</th>
+        <th>Station Names</th>
+        <th>Station Type</th>
+        <th>NO<sub>2</sub></th>
+        <th>O<sub>3</sub></h>
+        <th>SO<sub>2</sub></th>
+        <th>CO</th>
+        <th>PM<sub>10</sub></th>
+        <th>PM<sub>2.5</sub></th>
+        <th>AQHI</th>
+      </tr>
+      {% for air_quality in air_qualities %}
+        <tr>
+          <td>{{ air_quality.publish_timestamp.strftime('%Y/%m/%d-%H:%M') }}</td>
+          <td>{{ air_quality.station_name }}</td>
+          <td>{{ air_quality.station_type }}</td>
+          <td>{{ air_quality.no2 }}</td>
+          <td>{{ air_quality.o3 }}</td>
+          <td>{{ air_quality.so2 }}</td>
+          <td>{{ air_quality.co }}</td>
+          <td>{{ air_quality.pm10 }}</td>
+          <td>{{ air_quality.pm2_5 }}</td>
+          <td>{{ air_quality.aqhi }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+    </div>
+    <div>Remark:
+      <ol>
+        <li>NO<sub>2</sub> - nitrogen dioxide, O<sub>3</sub> - ozone, SO<sub>2</sub> - sulphur dioxide, CO - carbon monoxide, PM<sub>10</sub>/RSP -  particulate matter with an aerodynamic diameter of less than 10 μm / respirable suspended particulates, PM<sub>2.5</sub> / FSP - particulate matter with an aerodynamic diameter of less than 2.5 μm / fine suspended particulates.</li>
+        <li>Concentrations in micrograms per cubic meter (μg/m<sup>3</sup>).</li>
+        <li>Pollutant concentrations and AQHI information are based on raw data taken directly from EPD's Air Quality Monitoring Network.</li>
+      </ol>
+    </div>

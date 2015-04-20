@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+{% autoescape true %}
+<html>
+  <body>
+    <div>{{ users.get_current_user().nickname() }} <a href="{{ users.create_logout_url('/') }}">Sign out</a>
+    </div>
+    {% include "table.html" %}
+  </body>
+</html>
+{% endautoescape %}

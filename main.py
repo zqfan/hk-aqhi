@@ -20,11 +20,14 @@
 
 from __future__ import print_function
 
-from datetime import datetime
+import calendar
+import datetime
 import os
 
 from bs4 import BeautifulSoup
 import flask
+from flask import request
+from google.appengine.api import users
 from google.appengine.ext import ndb
 import jinja2
 import requests
@@ -62,7 +65,10 @@ def get_sample_data():
     query = AirQuality.query(ancestor=key)
     air_qualities = query.order(-AirQuality.timestamp).fetch(24)
     template = JINJA_ENVIRONMENT.get_template('index.html')
-    return template.render({'air_qualities': air_qualities})
+    return template.render({
+        'users': users,
+        'air_qualities': air_qualities
+    })
 
 def _get_latest_data():
     key = get_air_quality_key()
@@ -77,7 +83,8 @@ def grab_and_store_data():
     soup = BeautifulSoup(resp.content)
 
     time_text = soup.find(id='distribution_Eng').find('p').text
-    publish_timestamp = datetime.strptime(time_text, '(At %Y-%m-%d %H:%M)')
+    publish_timestamp = datetime.datetime.strptime(
+        time_text, '(At %Y-%m-%d %H:%M)')
 
     latest_data = _get_latest_data()
     if latest_data and latest_data.publish_timestamp == publish_timestamp:
@@ -135,6 +142,37 @@ def get_charts(name):
 @app.route('/charts/stations/Central/Western')
 def _cw_redirect():
     return get_charts('Central/Western')
+
+@app.route('/statistics')
+def statistics():
+    station = request.args.get('station')
+    now = datetime.datetime.utcnow()
+    year = int(request.args.get('year', now.year))
+    month = int(request.args.get('month', now.month))
+    start = datetime.datetime(year, month, 1)
+    days = calendar.monthrange(year, month)[1]
+    end = start + datetime.timedelta(days=days)
+
+    key = get_air_quality_key()
+    kwargs = {
+        'ancestor': key,
+    }
+    if station:
+        query = AirQuality.query(AirQuality.publish_timestamp>=start,
+                                 AirQuality.publish_timestamp<end,
+                                 AirQuality.station_name==station,
+                                 ancestor=key)
+    else:
+        query = AirQuality.query(AirQuality.publish_timestamp>=start,
+                                 AirQuality.publish_timestamp<end,
+                                 ancestor=key)
+
+    datas = query.order(-AirQuality.publish_timestamp, -AirQuality.timestamp).fetch()
+    template = JINJA_ENVIRONMENT.get_template('statistics.html')
+    return template.render({
+        'users': users,
+        'air_qualities': datas
+    })
 
 @app.route('/js/<path:filename>')
 def get_js(filename):

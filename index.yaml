@@ -36,6 +36,27 @@ indexes:
 - kind: AirQuality
   ancestor: yes
   properties:
+  - name: publish_timestamp
+    direction: desc
+
+- kind: AirQuality
+  ancestor: yes
+  properties:
+  - name: publish_timestamp
+    direction: desc
+  - name: timestamp
+    direction: desc
+
+- kind: AirQuality
+  ancestor: yes
+  properties:
+  - name: station_name
+  - name: publish_timestamp
+    direction: desc
+
+- kind: AirQuality
+  ancestor: yes
+  properties:
   - name: station_name
   - name: timestamp
 
