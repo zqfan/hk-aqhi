@@ -126,6 +126,9 @@ def grab_and_store_data():
 
 @app.route('/charts/stations/<name>')
 def get_charts(name):
+    valid_users = ['aji.zqfan@gmail.com', 'jennyfzl@gmail.com']
+    if users.get_current_user().email() not in valid_users:
+        return 'Not Authorized', 401
     name = str(name)
     key = get_air_quality_key()
     query = AirQuality.query(AirQuality.station_name==name, ancestor=key)
@@ -145,6 +148,8 @@ def _cw_redirect():
 
 @app.route('/statistics')
 def statistics():
+    if users.get_current_user().email() != 'aji.zqfan@gmail.com':
+        return 'Not Authorized', 401
     station = request.args.get('station')
     now = datetime.datetime.utcnow()
     year = int(request.args.get('year', now.year))
@@ -167,7 +172,8 @@ def statistics():
                                  AirQuality.publish_timestamp<end,
                                  ancestor=key)
 
-    datas = query.order(-AirQuality.publish_timestamp, -AirQuality.timestamp).fetch()
+    datas = query.order(-AirQuality.publish_timestamp,
+                        -AirQuality.timestamp).fetch()
     template = JINJA_ENVIRONMENT.get_template('statistics.html')
     return template.render({
         'users': users,

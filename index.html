@@ -5,7 +5,7 @@
     <div>{{ users.get_current_user().nickname() }} <a href="{{ users.create_logout_url('/') }}">Sign out</a></div>
     <div>Usage:
       <ul>
-        <li><a href="./flush">/flush</a>: flush new data into database.</li>
+        <li><a href="./flush">/flush</a>: flush new data (if there is) into database.</li>
         <li><a href="./charts/stations/Eastern">/charts/stations/Eastern</a>: get latest 24 datapoints of specified station, for example, Eastern. Note, it is case sensitive. You can get the station list via the following sample table.</li>
         <li><a href="./statistics?year=2015&month=1&station=Eastern">/statistics?year=2015&month=1&station=Eastern</a>: get statistics for station Eastern on Jan 2015. If year/month is not set, then it defaults to current year/month, if station is not set, then it defaults to get all stations.</li>
       </ul>
